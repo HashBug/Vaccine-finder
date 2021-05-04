@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <h1>Find Vaccines for 18+ candidates</h1>
+    <h1>Find Vaccines for 18-45 or 45+ candidates</h1>
     <div class="options">
       <select @change="onChange" v-model="selectedState" id="selectedState">
         <option value="0">Select State</option>
@@ -9,6 +9,15 @@
           :key="state.state_id"
           :value="state.state_id"
           >{{ state.state_name }}</option
+        >
+      </select>
+      <select v-model="selectedDistrict" id="selectedDistrict">
+        <option value="all">All Districts</option>
+        <option
+          v-for="dist in districts"
+          :key="dist.district_id"
+          :value="dist.district_id"
+          >{{ dist.district_name }}</option
         >
       </select>
       <div class="radios">
@@ -74,6 +83,7 @@ export default {
       availableCenters: [],
       vaccine: "covaxin",
       age: 18,
+      selectedDistrict: "all",
     };
   },
   created() {
@@ -140,6 +150,17 @@ export default {
     },
     age: function() {
       this.getOnlyAvailableSlots();
+    },
+    selectedDistrict: function() {
+      let distArray = JSON.parse(JSON.stringify(this.districts));
+      if (this.selectedDistrict !== "all") {
+        const dist = distArray.filter(
+          (district) => district.district_id == this.selectedDistrict
+        );
+        this.districts = dist;
+      } else {
+        this.fetchDistricts(this.selectedState);
+      }
     },
   },
 };
