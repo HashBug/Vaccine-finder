@@ -1,19 +1,36 @@
 <template>
   <div class="hello">
     <h1>Find Vaccines for 18+ candidates</h1>
-    <select @change="onChange" v-model="selectedState" id="selectedState">
-      <option value="0">Select State</option>
-      <option
-        v-for="state in states"
-        :key="state.state_id"
-        :value="state.state_id"
-        >{{ state.state_name }}</option
-      >
-    </select>
-    <input type="radio" v-model="vaccine" value="covishield" id="covishield" />
-    <label for="covishield">Covishield</label>
-    <input type="radio" v-model="vaccine" value="covaxin" id="covaxin" />
-    <label for="covaxin">Covaxin</label>
+    <div class="options">
+      <select @change="onChange" v-model="selectedState" id="selectedState">
+        <option value="0">Select State</option>
+        <option
+          v-for="state in states"
+          :key="state.state_id"
+          :value="state.state_id"
+          >{{ state.state_name }}</option
+        >
+      </select>
+      <div class="radios">
+        <span>Vaccine:</span>
+        <input
+          type="radio"
+          v-model="vaccine"
+          value="covishield"
+          id="covishield"
+        />
+        <label for="covishield">Covishield</label>
+        <input type="radio" v-model="vaccine" value="covaxin" id="covaxin" />
+        <label for="covaxin">Covaxin</label>
+      </div>
+      <div class="radios">
+        <span>Age:</span>
+        <input type="radio" v-model.number="age" value="18" id="adult" />
+        <label for="adult">18-45</label>
+        <input type="radio" v-model.number="age" value="45" id="old" />
+        <label for="old">45+</label>
+      </div>
+    </div>
     <table>
       <thead>
         <th>Center</th>
@@ -56,6 +73,7 @@ export default {
       centers: [],
       availableCenters: [],
       vaccine: "covaxin",
+      age: 18,
     };
   },
   created() {
@@ -96,7 +114,7 @@ export default {
         return center.sessions.some(
           (session) =>
             session.available_capacity > 0 &&
-            session.min_age_limit === 18 &&
+            session.min_age_limit === this.age &&
             session.vaccine.toLowerCase() === this.vaccine
         );
       });
@@ -120,12 +138,21 @@ export default {
     vaccine: function() {
       this.getOnlyAvailableSlots();
     },
+    age: function() {
+      this.getOnlyAvailableSlots();
+    },
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.options {
+  max-width: 80%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+}
 select {
   padding: 5px;
   margin: 5px;
