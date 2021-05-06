@@ -157,7 +157,8 @@ export default {
         const dist = distArray.filter(
           (district) => district.district_id == this.selectedDistrict
         );
-        this.districts = dist;
+        const dist_ids = dist.map((d) => d.district_id);
+        this.fetchVaccineData(dist_ids);
       } else {
         this.fetchDistricts(this.selectedState);
       }
