@@ -21,19 +21,19 @@
         >
       </select>
       <div class="radios">
-        <span>Vaccine:</span>
+        <h4>Vaccine:</h4>
         <input
           type="radio"
           v-model="vaccine"
-          value="covishield"
-          id="covishield"
+          value="COVISHIELD"
+          id="COVISHIELD"
         />
-        <label for="covishield">Covishield</label>
-        <input type="radio" v-model="vaccine" value="covaxin" id="covaxin" />
-        <label for="covaxin">Covaxin</label>
+        <label for="COVISHIELD">Covishield</label>
+        <input type="radio" v-model="vaccine" value="COVAXIN" id="COVAXIN" />
+        <label for="COVAXIN">Covaxin</label>
       </div>
       <div class="radios">
-        <span>Age:</span>
+        <h4>Age:</h4>
         <input type="radio" v-model.number="age" value="18" id="adult" />
         <label for="adult">18-45</label>
         <input type="radio" v-model.number="age" value="45" id="old" />
@@ -45,7 +45,7 @@
         <th>Center</th>
         <th>Availability</th>
       </thead>
-      <tbody>
+      <tbody v-if="availableCenters.length > 0">
         <tr v-for="center in availableCenters" :key="center.center_id">
           <td>
             {{ center.name }}
@@ -53,7 +53,11 @@
             {{ center.pincode }}
           </td>
           <span v-for="session in center.sessions" :key="session.session_id">
-            <span v-if="session.available_capacity > 0">
+            <span
+              v-if="
+                session.available_capacity > 0 && session.vaccine === vaccine
+              "
+            >
               <td>
                 {{ session.date }}<br />
                 {{ session.available_capacity }}<br />
@@ -61,6 +65,11 @@
               </td>
             </span>
           </span>
+        </tr>
+      </tbody>
+      <tbody v-else>
+        <tr>
+          <td><b>Not Available</b></td>
         </tr>
       </tbody>
     </table>
@@ -81,7 +90,7 @@ export default {
       districts: [],
       centers: [],
       availableCenters: [],
-      vaccine: "covaxin",
+      vaccine: "COVAXIN",
       age: 18,
       selectedDistrict: "all",
     };
@@ -125,7 +134,7 @@ export default {
           (session) =>
             session.available_capacity > 0 &&
             session.min_age_limit === this.age &&
-            session.vaccine.toLowerCase() === this.vaccine
+            session.vaccine === this.vaccine
         );
       });
       this.availableCenters = availableCenters;
@@ -169,15 +178,31 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.options {
+.hello {
   max-width: 80%;
+  min-height: 100vh;
   margin: 0 auto;
+  background: white;
+}
+.options {
+  margin-top: 50px;
+  margin-left: 20px;
+  margin-right: 20px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+@media only screen and (max-width: 600px) {
+  .options {
+    flex-direction: column;
+  }
 }
 select {
-  padding: 5px;
   margin: 5px;
+}
+
+label {
+  margin: 0 5px;
 }
 table {
   margin: 2em auto;
@@ -185,14 +210,25 @@ table {
 table,
 th,
 td {
-  border: 1px solid black;
+  border: 1px solid #ddd;
+  border-collapse: collapse;
 }
 th,
 td {
   max-width: 400px;
   padding: 5px;
 }
+th {
+  background: #4caf50;
+  color: #fff;
+}
 tr {
   text-align: left;
+}
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+h4 {
+  padding: 2px;
 }
 </style>
