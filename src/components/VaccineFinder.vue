@@ -50,6 +50,7 @@
           <td>
             {{ center.name }}
             {{ center.address }} <br />
+            {{ center.district_name }}<br />
             {{ center.pincode }}
           </td>
           <span v-for="session in center.sessions" :key="session.session_id">
@@ -97,6 +98,10 @@ export default {
   },
   created() {
     this.fetchStates();
+  },
+  mounted() {
+    this.selectedState = 9;
+    this.fetchDistricts(this.selectedState);
   },
   methods: {
     async fetchStates() {
