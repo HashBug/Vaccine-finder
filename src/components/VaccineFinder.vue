@@ -39,6 +39,8 @@
         <input type="radio" v-model.number="age" value="45" id="old" />
         <label for="old">45+</label>
       </div>
+      <h4>Date:</h4>
+      <input type="date" v-model="date" id="date" />
     </div>
     <table>
       <thead>
@@ -89,11 +91,13 @@ export default {
       states: [],
       selectedState: 0,
       districts: [],
+      districtIds: [],
       centers: [],
       availableCenters: [],
       vaccine: "COVAXIN",
       age: 18,
       selectedDistrict: "all",
+      date: moment().format("YYYY-MM-DD"),
     };
   },
   created() {
@@ -119,7 +123,7 @@ export default {
     },
 
     async getData(id) {
-      let date = moment().format("DD-MM-YYYY");
+      let date = moment(this.date).format("DD-MM-YYYY");
       const vaccineData = await fetch(
         `${this.url}/appointment/sessions/public/calendarByDistrict?district_id=${id}&date=${date}`
       );
@@ -127,8 +131,8 @@ export default {
       return vaccineJson.centers;
     },
 
-    async fetchVaccineData(districtIds) {
-      const centerList = await Promise.all(districtIds.map(this.getData));
+    async fetchVaccineData() {
+      const centerList = await Promise.all(this.districtIds.map(this.getData));
       const array = centerList.reduce((arr, row) => arr.concat(row), []);
       this.centers = array;
     },
@@ -154,7 +158,8 @@ export default {
       const districtIds = this.districts.map(
         (district) => district.district_id
       );
-      this.fetchVaccineData(districtIds);
+      this.districtIds = districtIds;
+      this.fetchVaccineData();
     },
     centers: function() {
       this.getOnlyAvailableSlots();
@@ -172,10 +177,14 @@ export default {
           (district) => district.district_id == this.selectedDistrict
         );
         const dist_ids = dist.map((d) => d.district_id);
-        this.fetchVaccineData(dist_ids);
+        this.districtIds = dist_ids;
+        this.fetchVaccineData();
       } else {
         this.fetchDistricts(this.selectedState);
       }
+    },
+    date: function() {
+      this.fetchVaccineData();
     },
   },
 };
